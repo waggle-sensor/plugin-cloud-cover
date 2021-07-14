@@ -8,7 +8,6 @@ import numpy as np
 from unet_module import Unet_Main
 
 import waggle.plugin as plugin
-from waggle.data import open_data_source
 from waggle.data.vision import Camera
 
 TOPIC_INPUT_IMAGE = "sky_image"

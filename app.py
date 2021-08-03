@@ -10,23 +10,24 @@ from unet_module import Unet_Main
 import waggle.plugin as plugin
 from waggle.data.vision import Camera
 
-TOPIC_INPUT_IMAGE = "sky_image"
 TOPIC_CLOUDCOVER = "env.coverage.cloud"
 
 plugin.init()
-camera = Camera()
+
 
 def run(args):
     unet_main = Unet_Main()
-
     sampling_countdown = -1
     if args.sampling_interval >= 0:
         print(f"Sampling enabled -- occurs every {args.sampling_interval}th inferencing")
         sampling_countdown = args.sampling_interval
+
     print("Cloud cover estimation starts...")
+    camera = Camera(args.stream)
     while True:
-        image = camera.snapshot()
-        timestamp = image.timestamp
+        sample = camera.snapshot()
+        image = sample.data
+        timestamp = sample.timestamp
         #image = cv2.imread('test.jpg')
         #timestamp = time.time()
 
@@ -35,20 +36,17 @@ def run(args):
         ratio = unet_main.run(image)
         if args.debug:
             e = time.time()
-            print(e-s)
+            print(f'Time elapsed for inferencing: {e-s} seconds')
 
         plugin.publish(TOPIC_CLOUDCOVER, ratio, timestamp=timestamp)
-        if args.debug:
-            print(f"Cloud coverage: {ratio}")
-            print(f"Measures published")
+        print(f"Cloud coverage: {ratio} at time: {timestamp}")
 
         if sampling_countdown > 0:
             sampling_countdown -= 1
         elif sampling_countdown == 0:
-            cv2.imwrite('/tmp/sample.jpg', image)
-            plugin.upload_file('/tmp/sample.jpg')
-            if args.debug:
-                print("A sample is published")
+            sample.save('sample.jpg')
+            plugin.upload_file('sample.jpg')
+            print("A sample is published")
             # Reset the count
             sampling_countdown = args.sampling_interval
 
@@ -62,6 +60,10 @@ if __name__ == '__main__':
         '-debug', dest='debug',
         action='store_true', default=False,
         help='Debug flag')
+    parser.add_argument(
+        '-stream', dest='stream',
+        action='store', default="camera",
+        help='ID or name of a stream, e.g. sample')
     parser.add_argument(
         '-interval', dest='interval',
         action='store', default=0, type=int,

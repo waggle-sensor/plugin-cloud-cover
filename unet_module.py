@@ -1,3 +1,4 @@
+import cv2
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -14,7 +15,8 @@ class Unet_Main:
         self.net.load_state_dict(torch.load('wagglecloud_unet_300.pth', map_location=self.device))
         self.net.eval()
 
-    def preprocess(self, img_nd, scale, n_classes=2):
+    def preprocess(self, img_nd, scale, img_size=(300, 300), n_classes=2):
+        img_nd = cv2.resize(img_nd, img_size)
         if len(img_nd.shape) == 2:
             # mask target image
             img_nd = np.expand_dims(img_nd, axis=2)

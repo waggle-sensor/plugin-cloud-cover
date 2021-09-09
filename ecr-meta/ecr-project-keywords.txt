@@ -1,1 +1,0 @@
-machine learning, U-Net, image segmentation, cloud coverage, ground-based images

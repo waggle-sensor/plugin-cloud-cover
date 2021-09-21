@@ -9,6 +9,7 @@ keywords: "machine learning, U-Net, image segmentation, cloud coverage, ground-b
 source:
   architectures :
     - "linux/arm64"
+    - "linux/amd64"
   url: "https://github.com/nconrad/plugin-cloudcover-unet.git"
   build_args:
     SAGE_STORE_URL: "https://osn.sagecontinuum.org"

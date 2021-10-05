@@ -24,22 +24,25 @@ def run(args):
 
     print("Cloud cover estimation starts...")
     camera = Camera(args.stream)
+    # camera = Camera()
     while True:
         sample = camera.snapshot()
         image = sample.data
         timestamp = sample.timestamp
-        #image = cv2.imread('test.jpg')
-        #timestamp = time.time()
+        # image = cv2.imread('test6.jpg')
+        # timestamp = time.time()
 
         if args.debug:
             s = time.time()
-        ratio = unet_main.run(image)
+        ratio, hi = unet_main.run(image, out_threshold=args.threshold)
         if args.debug:
             e = time.time()
             print(f'Time elapsed for inferencing: {e-s} seconds')
 
         plugin.publish(TOPIC_CLOUDCOVER, ratio, timestamp=timestamp)
         print(f"Cloud coverage: {ratio} at time: {timestamp}")
+        plugin.upload_file(hi, timestamp=timestamp)
+        print(f"Cloud coverage result at time: {timestamp}")
 
         if sampling_countdown > 0:
             sampling_countdown -= 1
@@ -72,4 +75,8 @@ if __name__ == '__main__':
         '-sampling-interval', dest='sampling_interval',
         action='store', default=-1, type=int,
         help='Sampling interval between inferencing')
+    parser.add_argument(
+        '-threshold', dest='threshold',
+        action='store', default=0.9, type=float,
+        help='Cloud pixel determination threshold')
     run(parser.parse_args())

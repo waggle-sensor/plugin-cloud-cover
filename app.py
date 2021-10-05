@@ -22,14 +22,15 @@ def run(args):
         print(f"Sampling enabled -- occurs every {args.sampling_interval}th inferencing")
         sampling_countdown = args.sampling_interval
 
-    print("Cloud cover estimation starts...")
+    # print("Cloud cover estimation starts...")
     camera = Camera(args.stream)
     # camera = Camera()
     while True:
         sample = camera.snapshot()
         image = sample.data
         timestamp = sample.timestamp
-        # image = cv2.imread('test6.jpg')
+        # image = cv2.imread('test4.jpg')
+        # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         # timestamp = time.time()
 
         if args.debug:
@@ -41,8 +42,8 @@ def run(args):
 
         plugin.publish(TOPIC_CLOUDCOVER, ratio, timestamp=timestamp)
         print(f"Cloud coverage: {ratio} at time: {timestamp}")
-        plugin.upload_file(hi, timestamp=timestamp)
-        print(f"Cloud coverage result at time: {timestamp}")
+        # plugin.upload_file(hi, timestamp=timestamp)
+        # print(f"Cloud coverage result at time: {timestamp}")
 
         if sampling_countdown > 0:
             sampling_countdown -= 1

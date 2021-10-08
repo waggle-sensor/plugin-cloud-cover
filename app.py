@@ -42,8 +42,10 @@ def run(args):
 
         plugin.publish(TOPIC_CLOUDCOVER, ratio, timestamp=timestamp)
         print(f"Cloud coverage: {ratio} at time: {timestamp}")
-        # plugin.upload_file(hi, timestamp=timestamp)
-        # print(f"Cloud coverage result at time: {timestamp}")
+        cv2.imwrite('cloudresult.jpg', hi)
+        print('saved')
+        plugin.upload_file('cloudresult.jpg')
+        print(f"Cloud coverage result at time: {timestamp}")
 
         if sampling_countdown > 0:
             sampling_countdown -= 1

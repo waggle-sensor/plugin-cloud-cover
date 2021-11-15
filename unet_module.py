@@ -11,7 +11,7 @@ import math
 def getInputPoint(x, y, srcwidth, srcheight):
     psph = []
     pfish = []
-     
+
     FOV =float(math.pi/180 * 180)
     FOV2 = float(math.pi/180 * 180)
     width = srcwidth
@@ -88,13 +88,12 @@ class Unet_Main:
                   out_threshold,
                   scale_factor=1):
 
-        h, w, c = full_img.shape
-        de_img = dewarping(full_img, h, w)
+        #h, w, c = full_img.shape
+        #de_img = dewarping(full_img, h, w)
         img = torch.from_numpy(self.preprocess(full_img, scale_factor))
 
         img = img.unsqueeze(0)
         img = img.to(device=self.device, dtype=torch.float32)
-
 
         with torch.no_grad():
             output = self.net(img)
@@ -122,7 +121,7 @@ class Unet_Main:
 
             score2 = np.reshape(scores, (300,300))
             score3 = cv2.cvtColor(score2, cv2.COLOR_GRAY2BGR).astype(np.uint8)
-            de = cv2.resize(de_img, (300,300))
+            de = cv2.resize(full_img, (300,300))
             # full = cv2.resize(full_img, (300,300))
             hi = np.concatenate((de, score3), axis=1)
             # cv2.imshow('image', hi)

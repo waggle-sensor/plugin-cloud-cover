@@ -6,6 +6,7 @@ import torch
 import numpy as np
 
 from unet_module import Unet_Main
+from unet_module import dewarping
 
 import waggle.plugin as plugin
 from waggle.data.vision import Camera
@@ -16,36 +17,65 @@ plugin.init()
 
 
 def run(args):
+    timestamp = time.time()
+    plugin.publish(TOPIC_CLOUDCOVER, 'Cloud Cover Estimator: Start', timestamp=timestamp)
+    print(f"Starts at time: {timestamp}")
+    timestamp = time.time()
+    plugin.publish(TOPIC_CLOUDCOVER, 'Cloud Cover Estimator: Loading Model', timestamp=timestamp)
+    print(f"Loading Model at time: {timestamp}")
     unet_main = Unet_Main()
+    timestamp = time.time()
+    plugin.publish(TOPIC_CLOUDCOVER, 'Cloud Cover Estimator: Model Loaded', timestamp=timestamp)
+    print(f"Model Loaded at time: {timestamp}")
     sampling_countdown = -1
     if args.sampling_interval >= 0:
         print(f"Sampling enabled -- occurs every {args.sampling_interval}th inferencing")
         sampling_countdown = args.sampling_interval
 
+    plugin.publish(TOPIC_CLOUDCOVER, 'Cloud Cover Estimator: Loading an Image', timestamp=timestamp)
+    print(f"Loading an Image at time: {timestamp}")
     # print("Cloud cover estimation starts...")
     camera = Camera(args.stream)
-    # camera = Camera()
+    #camera = Camera()
     while True:
         sample = camera.snapshot()
         image = sample.data
-        timestamp = sample.timestamp
-        # image = cv2.imread('test4.jpg')
-        # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        # timestamp = time.time()
+        imagetimestamp = sample.timestamp
+        #image = cv2.imread('test.jpg')
+        #image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        #imagetimestamp = time.time()
+        timestamp = time.time()
+        plugin.publish(TOPIC_CLOUDCOVER, 'Cloud Cover Estimator: an Image Loaded', timestamp=timestamp)
+        print(f"Image Loaded at time: {timestamp}")
 
         if args.debug:
             s = time.time()
+        timestamp = time.time()
+        plugin.publish(TOPIC_CLOUDCOVER, 'Cloud Cover Estimator: Starting Preprocessing', timestamp=timestamp)
+        print(f"Starting Preprocessing at time: {timestamp}")
+        h, w, c = image.shape
+        image = dewarping(image, h, w)
+        timestamp = time.time()
+        plugin.publish(TOPIC_CLOUDCOVER, 'Cloud Cover Estimator: End Preprocessing', timestamp=timestamp)
+        print(f"End Preprocessing at time: {timestamp}")
+        timestamp = time.time()
+        plugin.publish(TOPIC_CLOUDCOVER, 'Cloud Cover Estimator: Starting Inference', timestamp=timestamp)
+        print(f"Inference Starts at time: {timestamp}")
         ratio, hi = unet_main.run(image, out_threshold=args.threshold)
+        timestamp = time.time()
+        plugin.publish(TOPIC_CLOUDCOVER, 'Cloud Cover Estimator: End Inference', timestamp=timestamp)
+        print(f"End Inference at time: {timestamp}")
         if args.debug:
             e = time.time()
             print(f'Time elapsed for inferencing: {e-s} seconds')
-
-        plugin.publish(TOPIC_CLOUDCOVER, ratio, timestamp=timestamp)
-        print(f"Cloud coverage: {ratio} at time: {timestamp}")
+        timestamp = time.time()
+        plugin.publish(TOPIC_CLOUDCOVER, ratio, timestamp=imagetimestamp)
+        print(f"Cloud coverage: {ratio} at time: {imagetimestamp}")
         cv2.imwrite('cloudresult.jpg', hi)
         print('saved')
+        exit(0)
         plugin.upload_file('cloudresult.jpg')
-        print(f"Cloud coverage result at time: {timestamp}")
+        print(f"Cloud coverage result at time: {imagetimestamp}")
 
         if sampling_countdown > 0:
             sampling_countdown -= 1
@@ -58,6 +88,8 @@ def run(args):
 
         if args.interval > 0:
             time.sleep(args.interval)
+
+        exit(0)
 
 
 if __name__ == '__main__':

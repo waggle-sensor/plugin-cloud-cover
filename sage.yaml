@@ -1,15 +1,15 @@
-name: "cloudcover-unet"
+name: "cloudcover"
 description: "U-Net Cloud Coverage Estimator"
 version : "0.0.0"
 namespace: "sage"
 authors: "Seongha Park <seongha.park@anl.gov>"
 license: "MIT license"
-homepage: "https://github.com/waggle-sensor/plugin-cloudcover-unet"
+homepage: "https://github.com/waggle-sensor/plugin-cloud-cover"
 keywords: "machine learning, U-Net, image segmentation, cloud coverage, ground-based images"
 source:
   architectures :
     - "linux/arm64"
-  url: "https://github.com/nconrad/plugin-cloudcover-unet.git"
+  url: "https://github.com/nconrad/plugin-cloud-cover.git"
   build_args:
     SAGE_STORE_URL: "https://osn.sagecontinuum.org"
     BUCKET_ID_MODEL: "a42a4a21-f7ac-4a7c-ba76-325595637eee"

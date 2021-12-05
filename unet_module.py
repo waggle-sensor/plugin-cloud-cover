@@ -8,6 +8,8 @@ from unet import UNet
 
 import math
 
+import time
+
 def getInputPoint(x, y, srcwidth, srcheight):
     psph = []
     pfish = []
@@ -23,8 +25,8 @@ def getInputPoint(x, y, srcwidth, srcheight):
 
     ## Vector in 3D space
     psph.append(math.cos(phi) * math.sin(theta))   ## x
-    psph.append(math.cos(phi) * math.cos(theta))   ## y 
-    psph.append(math.sin(phi) * math.cos(theta))   ## z 
+    psph.append(math.cos(phi) * math.cos(theta))   ## y
+    psph.append(math.sin(phi) * math.cos(theta))   ## z
 
     ## Calculate fisheye angle and radius
     theta = math.atan2(psph[2],psph[0])
@@ -43,7 +45,7 @@ def dewarping(originalimage, h, w):
     outimage = originalimage.copy()
     for i in range(len(outimage)):
         for j in range(len(outimage[0])):
-            inP = getInputPoint(i,j,w,h);
+            inP = getInputPoint(i,j,h,w);
             inP2 = [int(inP[0]), int(inP[1])]
 
             if inP2[0] >= w or inP2[1] >= h:
@@ -56,7 +58,7 @@ def dewarping(originalimage, h, w):
             outimage[i][j][1] = originalimage[inP2[0]][inP2[1]][1]
             outimage[i][j][2] = originalimage[inP2[0]][inP2[1]][2]
 
-    margin = 150
+    margin = 80
     outimage2 = outimage[margin:-margin, margin:-margin]
 
     return outimage2

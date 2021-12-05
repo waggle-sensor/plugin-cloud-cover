@@ -32,6 +32,7 @@ def run(args):
         print(f"Sampling enabled -- occurs every {args.sampling_interval}th inferencing")
         sampling_countdown = args.sampling_interval
 
+    timestamp = time.time()
     plugin.publish(TOPIC_CLOUDCOVER, 'Cloud Cover Estimator: Loading an Image', timestamp=timestamp)
     print(f"Loading an Image at time: {timestamp}")
     # print("Cloud cover estimation starts...")
@@ -41,7 +42,7 @@ def run(args):
         sample = camera.snapshot()
         image = sample.data
         imagetimestamp = sample.timestamp
-        #image = cv2.imread('test.jpg')
+        #image = cv2.imread('image.jpg')
         #image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         #imagetimestamp = time.time()
         timestamp = time.time()
@@ -59,12 +60,12 @@ def run(args):
         plugin.publish(TOPIC_CLOUDCOVER, 'Cloud Cover Estimator: End Preprocessing', timestamp=timestamp)
         print(f"End Preprocessing at time: {timestamp}")
         timestamp = time.time()
-        plugin.publish(TOPIC_CLOUDCOVER, 'Cloud Cover Estimator: Starting Inference', timestamp=timestamp)
-        print(f"Inference Starts at time: {timestamp}")
+        plugin.publish(TOPIC_CLOUDCOVER, 'Cloud Cover Estimator: Starting Inference and Postprocessing', timestamp=timestamp)
+        print(f"Inference and postprocessing Starts at time: {timestamp}")
         ratio, hi = unet_main.run(image, out_threshold=args.threshold)
         timestamp = time.time()
-        plugin.publish(TOPIC_CLOUDCOVER, 'Cloud Cover Estimator: End Inference', timestamp=timestamp)
-        print(f"End Inference at time: {timestamp}")
+        plugin.publish(TOPIC_CLOUDCOVER, 'Cloud Cover Estimator: End Inference and Postprocessing', timestamp=timestamp)
+        print(f"End Inference and postprocessing at time: {timestamp}")
         if args.debug:
             e = time.time()
             print(f'Time elapsed for inferencing: {e-s} seconds')
@@ -73,9 +74,9 @@ def run(args):
         print(f"Cloud coverage: {ratio} at time: {imagetimestamp}")
         cv2.imwrite('cloudresult.jpg', hi)
         print('saved')
-        exit(0)
         plugin.upload_file('cloudresult.jpg')
-        print(f"Cloud coverage result at time: {imagetimestamp}")
+        timestamp = time.time()
+        print(f"End plugin at time {timestamp}")
 
         if sampling_countdown > 0:
             sampling_countdown -= 1

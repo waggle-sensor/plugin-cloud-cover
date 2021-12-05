@@ -11,7 +11,7 @@ import math
 def getInputPoint(x, y, srcwidth, srcheight):
     psph = []
     pfish = []
-     
+
     FOV =float(math.pi/180 * 180)
     FOV2 = float(math.pi/180 * 180)
     width = srcwidth
@@ -23,8 +23,8 @@ def getInputPoint(x, y, srcwidth, srcheight):
 
     ## Vector in 3D space
     psph.append(math.cos(phi) * math.sin(theta))   ## x
-    psph.append(math.cos(phi) * math.cos(theta))   ## y 
-    psph.append(math.sin(phi) * math.cos(theta))   ## z 
+    psph.append(math.cos(phi) * math.cos(theta))   ## y
+    psph.append(math.sin(phi) * math.cos(theta))   ## z
 
     ## Calculate fisheye angle and radius
     theta = math.atan2(psph[2],psph[0])
@@ -39,11 +39,15 @@ def getInputPoint(x, y, srcwidth, srcheight):
 
     return pfish
 
-def dewarping(originalimage, h, w):
+def dewarping(originalimage):
+    h, w, c = originalimage.shape
+    print(h,w)
+
     outimage = originalimage.copy()
+    print(len(outimage), len(outimage[0]))
     for i in range(len(outimage)):
         for j in range(len(outimage[0])):
-            inP = getInputPoint(i,j,w,h);
+            inP = getInputPoint(i,j,h,w);
             inP2 = [int(inP[0]), int(inP[1])]
 
             if inP2[0] >= w or inP2[1] >= h:
@@ -88,9 +92,8 @@ class Unet_Main:
                   out_threshold,
                   scale_factor=1):
 
-        h, w, c = full_img.shape
-        de_img = dewarping(full_img, h, w)
-        img = torch.from_numpy(self.preprocess(full_img, scale_factor))
+        de_img = dewarping(full_img)
+        img = torch.from_numpy(self.preprocess(de_img, scale_factor))
 
         img = img.unsqueeze(0)
         img = img.to(device=self.device, dtype=torch.float32)

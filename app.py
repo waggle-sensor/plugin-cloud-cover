@@ -16,7 +16,13 @@ plugin.init()
 
 
 def run(args):
+    timestamp = time.time()
+    plugin.publish(TOPIC_CLOUDCOVER, 'Loading model', timestamp=timestamp)
+    print(f"Loading model at time: {timestamp}")
     unet_main = Unet_Main()
+    timestamp = time.time()
+    plugin.publish(TOPIC_CLOUDCOVER, 'Model loaded', timestamp=timestamp)
+    print(f"Model loaded at time: {timestamp}")
     sampling_countdown = -1
     if args.sampling_interval >= 0:
         print(f"Sampling enabled -- occurs every {args.sampling_interval}th inferencing")
@@ -24,28 +30,29 @@ def run(args):
 
     # print("Cloud cover estimation starts...")
     camera = Camera(args.stream)
-    # camera = Camera()
     while True:
         sample = camera.snapshot()
         image = sample.data
-        timestamp = sample.timestamp
-        # image = cv2.imread('test4.jpg')
-        # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        # timestamp = time.time()
+        imagetimestamp = sample.timestamp
+        #image = cv2.imread('image.jpg')
+        #image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        #timestamp = time.time()
 
-        if args.debug:
-            s = time.time()
+        timestamp = time.time()
+        plugin.publish(TOPIC_CLOUDCOVER, 'Preprocessing and inference started', timestamp=timestamp)
+        print(f"Preprecessing and inference started at time: {timestamp}")
+        s = time.time()
         ratio, hi = unet_main.run(image, out_threshold=args.threshold)
-        if args.debug:
-            e = time.time()
-            print(f'Time elapsed for inferencing: {e-s} seconds')
+        e = time.time()
+        print(f'Time elapsed for inferencing: {e-s} seconds')
+        plugin.publish(TOPIC_CLOUDCOVER, f'Time elapsed for inference {e-s} seconds', timestamp=e)
 
         plugin.publish(TOPIC_CLOUDCOVER, ratio, timestamp=timestamp)
-        print(f"Cloud coverage: {ratio} at time: {timestamp}")
+        print(f"Cloud coverage: {ratio} at time: {imagetimestamp}")
         cv2.imwrite('cloudresult.jpg', hi)
         print('saved')
         plugin.upload_file('cloudresult.jpg')
-        print(f"Cloud coverage result at time: {timestamp}")
+        print(f"Cloud coverage result at time: {imagetimestamp}")
 
         if sampling_countdown > 0:
             sampling_countdown -= 1
@@ -59,6 +66,7 @@ def run(args):
         if args.interval > 0:
             time.sleep(args.interval)
 
+        exit(0)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

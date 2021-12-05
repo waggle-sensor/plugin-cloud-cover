@@ -16,13 +16,8 @@ plugin.init()
 
 
 def run(args):
-    timestamp = time.time()
-    plugin.publish(TOPIC_CLOUDCOVER, 'Loading model', timestamp=timestamp)
-    print(f"Loading model at time: {timestamp}")
     unet_main = Unet_Main()
     timestamp = time.time()
-    plugin.publish(TOPIC_CLOUDCOVER, 'Model loaded', timestamp=timestamp)
-    print(f"Model loaded at time: {timestamp}")
     sampling_countdown = -1
     if args.sampling_interval >= 0:
         print(f"Sampling enabled -- occurs every {args.sampling_interval}th inferencing")
@@ -38,14 +33,13 @@ def run(args):
         #image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         #timestamp = time.time()
 
-        timestamp = time.time()
-        plugin.publish(TOPIC_CLOUDCOVER, 'Preprocessing and inference started', timestamp=timestamp)
-        print(f"Preprecessing and inference started at time: {timestamp}")
-        s = time.time()
+        if args.debug:
+            s = time.time()
         ratio, hi = unet_main.run(image, out_threshold=args.threshold)
-        e = time.time()
-        print(f'Time elapsed for inferencing: {e-s} seconds')
-        plugin.publish(TOPIC_CLOUDCOVER, f'Time elapsed for inference {e-s} seconds', timestamp=e)
+        if args.debug:
+            e = time.time()
+            print(f'Time elapsed for inferencing: {e-s} seconds')
+            plugin.publish(TOPIC_CLOUDCOVER, f'Time elapsed for inference {e-s} seconds', timestamp=e)
 
         plugin.publish(TOPIC_CLOUDCOVER, ratio, timestamp=timestamp)
         print(f"Cloud coverage: {ratio} at time: {imagetimestamp}")
@@ -66,7 +60,6 @@ def run(args):
         if args.interval > 0:
             time.sleep(args.interval)
 
-        exit(0)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

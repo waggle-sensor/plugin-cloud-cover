@@ -22,6 +22,24 @@ Model loading time:<br />
    '-sampling-interval': Sampling interval between inferencing (default = -1, no sampling)<br />
    '-threshold': Cloud pixel determination threshold (0-1) (default = 0.9)<br />
 
+## Funding
+https://www.nsf.gov/awardsearch/showAward?AWD_ID=1935984
+
+## Collaborators
+Bhupendra Raut,
+Dario Dematties Reyes,
+Joseph Swantek,
+Neal Conrad,
+Nicola Ferrier,
+Pete Beckman,
+Raj Sankaran,
+Robert Jackson,
+Scott Collis,
+Sean Shahkarami,
+Seongha Park,
+Sergey Shemyakin,
+Wolfgang Gerlach,
+Yongho kim
 
 ### Reference
 [1] Seongha Park, Yongho Kim, Nicola J. Ferrier, Scott M. Collis, Rajesh Sankaran and Pete H. Beckman “Prediction of Solar Irradiance and Photovoltaic Solar Energy Product Based on Cloud Coverage Estimation Using Machine Learning Methods”, 2020, Atmosphere, Volume 12, Issue 3, pages 395.<br />

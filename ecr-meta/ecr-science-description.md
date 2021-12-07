@@ -9,18 +9,18 @@ As a method to estimate cloud cover, we used a machine learning model called U-n
 The application is up and running in the daytime. The definition of daytime needs to come from users. At this moment, the application is running from 7 am - 5 pm. The application first collects data from the sky facing camera based on periodic sampling. The image is then passed through the U-Net [2] model to segment cloud pixels. The actual calculation that the U-Net is calculating is the possibility of how much each pixel should be classified as cloud or sky. With the probability calculated, the application segments the cloud based on the threshold that the user determines.
 
 # Using the code
-Output: cloud cover ratio (0-1)
-Input: single image (1/30 second required)
-Image resolution: 300x300
-Inference time:
-Model loading time:
+Output: cloud cover ratio (0-1)  
+Input: single image (1/30 second required)  
+Image resolution: 300x300  
+Inference time:  
+Model loading time:  
 
 # Arguments
-   '-debug': Debug flag
-   '-stream': ID or name of a stream, e.g. top-camera
-   '-interval': Inference interval in seconds (default = 0, as soon as the plugin can get image)
-   '-sampling-interval': Sampling interval between inferencing (default = -1, no sampling)
-   '-threshold': Cloud pixel determination threshold (0-1) (default = 0.9)
+   '-debug': Debug flag  
+   '-stream': ID or name of a stream, e.g. top-camera  
+   '-interval': Inference interval in seconds (default = 0, as soon as the plugin can get image)  
+   '-sampling-interval': Sampling interval between inferencing (default = -1, no sampling)  
+   '-threshold': Cloud pixel determination threshold (0-1) (default = 0.9)  
 
 # Funding
 https://www.nsf.gov/awardsearch/showAward?AWD_ID=1935984

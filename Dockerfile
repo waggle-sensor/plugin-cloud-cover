@@ -1,6 +1,7 @@
 FROM waggle/plugin-base:1.1.1-ml-cuda10.2-l4t
 
 COPY requirements.txt /app/
+RUN pip3 install --upgrade pip
 RUN pip3 install --no-cache-dir -r /app/requirements.txt
 
 COPY unet /app/unet

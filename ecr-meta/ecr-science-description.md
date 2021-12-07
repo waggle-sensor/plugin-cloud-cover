@@ -5,7 +5,7 @@ Many of the cloud images used in the studies have been collected from satellites
 
 As a method to estimate cloud cover, we used a machine learning model called U-net. To train each of the machine learning models with various sky conditions, we created a cloud dataset that can reinforce dark sky conditions and overcast on Singapore whole Sky imaging segmentation (SWIMSEG) dataset using a Waggle node deployed in Argonne National Laboratory.
 
-## AI at Edge:
+## AI@Edge:
 The application is up and running in the daytime. The definition of daytime needs to come from users. At this moment, the application is running from 7 am - 5 pm. The application first collects data from the sky facing camera based on periodic sampling. The image is then passed through the U-Net [2] model to segment cloud pixels. The actual calculation that the U-Net is calculating is the possibility of how much each pixel should be classified as cloud or sky. With the probability calculated, the application segments the cloud based on the threshold that the user determines.
 
 ## Using the code

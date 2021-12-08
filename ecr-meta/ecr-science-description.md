@@ -22,7 +22,7 @@ Model loading time:
    '-sampling-interval': Sampling interval between inferencing (default = -1, no sampling)  
    '-threshold': Cloud pixel determination threshold (0-1) (default = 0.9)  
 
-#Ontology:
+# Ontology:
 The code publishes measurements with toptic ‘env.cloud.cover’
 
 

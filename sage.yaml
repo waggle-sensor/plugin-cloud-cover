@@ -1,6 +1,6 @@
 name: "cloudcover"
 description: "U-Net Cloud Coverage Estimator"
-version : "0.0.0"
+version : "0.1.0"
 namespace: "sage"
 authors: "Seongha Park <seongha.park@anl.gov>"
 license: "MIT license"
@@ -11,6 +11,7 @@ collaborators: "Bhupendra Raut, Dario Dematties Reyes, Joseph Swantek, Neal Conr
 source:
   architectures :
     - "linux/arm64"
+    - "linux/amd64"
   url: "https://github.com/nconrad/plugin-cloud-cover.git"
   build_args:
     SAGE_STORE_URL: "https://osn.sagecontinuum.org"

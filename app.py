@@ -8,7 +8,7 @@ import numpy as np
 from unet_module import Unet_Main
 from unet_module import dewarping
 
-import waggle.plugin as Plugin
+from waggle.plugin import Plugin
 from waggle.data.vision import Camera
 
 TOPIC_CLOUDCOVER = "env.coverage.cloud"

@@ -23,7 +23,7 @@ Model loading time:
    '-threshold': Cloud pixel determination threshold (0-1) (default = 0.9)  
 
 # Ontology:
-The code publishes measurements with toptic ‘env.cloud.cover’
+The code publishes measurements with toptic ‘env.coverage.cloud’
 
 # Inference from Sage codes
 To query the output from the plugin, you can do with python library 'sage_data_client':

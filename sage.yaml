@@ -18,5 +18,7 @@ source:
 inputs:
   - id: "interval"
     type: "int"
+    description: "Inference interval in seconds (default = 0, as soon as the plugin can get image)"
   - id: "sampling-interval"
     type: "int"
+    descriptino: "Sampling interval between inferencing (default = -1, no sampling)"

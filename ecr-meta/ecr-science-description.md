@@ -8,6 +8,9 @@ As a method to estimate cloud cover, we used a machine learning model called U-n
 # AI@Edge:
 This application is intended for daylight hours. The daylight hours for a deployment is defined by the users, for example 7AM - 5PM. The application first collects data from the sky facing camera and then passes through the U-Net [2] model to segment cloud pixels. The output of U-Net is the cloud/clear-sky probability for each pixel. With the probability calculated, the application segments the clouds based on the threshold set by the user.
 
+# Additional information
+This study was funded by Exelon and performed during 2019-2022. The study was published in [MDPI Atmosphere](https://www.mdpi.com/2073-4433/12/3/395). Detailed information about training data is provided in the publication.
+
 # Using the code
 Output: cloud cover ratio (0-1)  
 Input: single image (1/30 second required)  

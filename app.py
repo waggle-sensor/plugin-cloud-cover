@@ -1,22 +1,18 @@
-import time
-import argparse
-
-import cv2
-import torch
+import time, argparse, cv2, torch
 import numpy as np
-
-from unet_module import Unet_Main
+from module import InferMain
 
 import waggle.plugin as plugin
 from waggle.data.vision import Camera
 
 TOPIC_CLOUDCOVER = "env.coverage.cloud"
+TOPIC_WHERE = "info.cloudcover.where"
 
 plugin.init()
 
 
 def run(args):
-    unet_main = Unet_Main()
+    infermain = InferMain()
     timestamp = time.time()
     sampling_countdown = -1
     if args.sampling_interval >= 0:
@@ -35,15 +31,16 @@ def run(args):
 
         if args.debug:
             s = time.time()
-        ratio, hi = unet_main.run(image, out_threshold=args.threshold)
+        ratio, fpoints, data = infermain.run(image)
         if args.debug:
             e = time.time()
             print(f'Time elapsed for inferencing: {e-s} seconds')
             plugin.publish(TOPIC_CLOUDCOVER, f'Time elapsed for inference {e-s} seconds', timestamp=e)
 
         plugin.publish(TOPIC_CLOUDCOVER, ratio, timestamp=timestamp)
-        print(f"Cloud coverage: {ratio} at time: {imagetimestamp}")
-        cv2.imwrite('cloudresult.jpg', hi)
+        plugin.publish(TOPIC_WHERE, fpoints, timestamp=timestamp)
+        print(f"Cloud coverage: {ratio} at {fpoints} at time: {imagetimestamp}")
+        cv2.imwrite('cloudresult.jpg', data)
         print('saved')
         plugin.upload_file('cloudresult.jpg')
         print(f"Cloud coverage result at time: {imagetimestamp}")
@@ -79,8 +76,4 @@ if __name__ == '__main__':
         '-sampling-interval', dest='sampling_interval',
         action='store', default=-1, type=int,
         help='Sampling interval between inferencing')
-    parser.add_argument(
-        '-threshold', dest='threshold',
-        action='store', default=0.9, type=float,
-        help='Cloud pixel determination threshold')
     run(parser.parse_args())

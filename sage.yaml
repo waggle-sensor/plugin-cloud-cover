@@ -1,13 +1,11 @@
 name: "cloud-cover"
 description: "U-Net Cloud Coverage Estimator"
-version : "0.1.4"
+version : "1.0.0"
 namespace: "sage"
 authors: "Seongha Park <seongha.park@anl.gov>"
 license: "MIT license"
 homepage: "https://github.com/waggle-sensor/plugin-cloud-cover"
 keywords: "machine learning, U-Net, image segmentation, cloud coverage, ground-based images"
-funding: "NSF 1935984"
-collaborators: "Bhupendra Raut, Dario Dematties Reyes, Joseph Swantek, Neal Conrad, Nicola Ferrier, Pete Beckman, Raj Sankaran, Robert Jackson, Scott Collis, Sean Shahkarami, Sergey Shemyakin, Wolfgang Gerlach, Yongho kim"
 source:
   architectures :
     - "linux/arm64"

@@ -85,11 +85,11 @@ def additional_information(copy_pred, pred):
                     fpoints.append(fpoint.xy)
                 for fcontour in fcontours:
                     fcoords = measure.approximate_polygon(fcontour, tolerance=2.5)
-                    if len(fcoords) < 25:
-                        pass
-                    else:
-                        fpoint = shapely.centroid(Polygon(fcoords))
-                        fpoints.append(fpoint.xy)
+                    ffcoords = []
+                    for cols in fcoords:
+                        ffcoords.append((float(cols[1]), float(cols[0])))
+                    fpoint = shapely.centroid(Polygon(ffcoords))
+                    fpoints.append(fpoint.xy)
 
     return ratio, fpoints
 

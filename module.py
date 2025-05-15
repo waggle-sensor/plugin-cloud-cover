@@ -106,7 +106,7 @@ class InferMain:
     def run(self, full_image):
 
         image = torch.from_numpy(self.preprocess(full_image.transpose(2, 0, 1)))
-        image_transformed = self.transform(image).type(torch.float16)
+        image_transformed = self.transform(image).type(torch.uint8)
         image = torchvision.io.decode_image(torchvision.io.encode_jpeg(image_transformed))
 
 

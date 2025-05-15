@@ -33,6 +33,7 @@ def additional_information(copy_pred, pred):
     circlepolygon = Polygon(circle)
     true_count = sum(circlepolygon.contains(point) for point in mask)
     ratio = true_count / (copy_pred.shape[0] * copy_pred.shape[1])
+    fpoints = []
 
     conf = torch.maximum(pred[0][0], pred[0][1]).detach().cpu().numpy()
 
@@ -42,7 +43,6 @@ def additional_information(copy_pred, pred):
         coords = np.array(points.exterior.coords[1:-1])
 
         c = 0
-        fpoints = []
         for i in range(len(coords)-1):
 
             triangle = np.array([[int(w/2), int(h/2)], coords[i], coords[i+1], [int(w/2), int(h/2)]])

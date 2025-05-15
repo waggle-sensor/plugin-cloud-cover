@@ -78,15 +78,18 @@ def additional_information(copy_pred, pred):
                         for l in range(128, 256):
                             if Point(k, l).within(tripolygon) and copy_pred[k][l] == True:
                                 tempimage[k][l] = True
-
+    
                 fcontours = measure.find_contours(tempimage)
+                if len(fcontours) == 0:
+                    fpoint = shapely.centroid(tripolygon)
+                    fpoints.append(fpoint.xy)
                 for fcontour in fcontours:
                     fcoords = measure.approximate_polygon(fcontour, tolerance=2.5)
                     if len(fcoords) < 25:
                         pass
                     else:
                         fpoint = shapely.centroid(Polygon(fcoords))
-                        fpoints.append(fpoint)
+                        fpoints.append(fpoint.xy)
 
     return ratio, fpoints
 

@@ -32,7 +32,7 @@ def additional_information(copy_pred, pred):
     circle = Point(int(w/2), int(h/2)).buffer(r, resolution=10)
     circlepolygon = Polygon(circle)
     true_count = sum(circlepolygon.contains(point) for point in mask)
-    ratio = true_count / (mask.shape[0] * mask.shape[1])
+    ratio = true_count / (copy_pred.shape[0] * copy_pred.shape[1])
 
     conf = torch.maximum(pred[0][0], pred[0][1]).detach().cpu().numpy()
 
@@ -42,6 +42,7 @@ def additional_information(copy_pred, pred):
         coords = np.array(points.exterior.coords[1:-1])
 
         c = 0
+        fpoints = []
         for i in range(len(coords)-1):
 
             triangle = np.array([[int(w/2), int(h/2)], coords[i], coords[i+1], [int(w/2), int(h/2)]])
@@ -78,7 +79,6 @@ def additional_information(copy_pred, pred):
                             if Point(k, l).within(tripolygon) and copy_pred[k][l] == True:
                                 tempimage[k][l] = True
 
-                fpoints = []
                 fcontours = measure.find_contours(tempimage)
                 for fcontour in fcontours:
                     fcoords = measure.approximate_polygon(fcontour, tolerance=2.5)
@@ -113,8 +113,7 @@ class InferMain:
         with torch.no_grad():
             output = self.net(image.unsqueeze(0).to(self.device).float())
 
-            copy_pred = output.copy()
-            copy_pred = copy_pred.argmax(axis=1).float()
+            copy_pred = output.argmax(axis=1).float()
             copy_pred = copy_pred.squeeze(0).detach().cpu().numpy()
 
             ratio, fpoints = additional_information(copy_pred, output)

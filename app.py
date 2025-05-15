@@ -38,7 +38,8 @@ def run(args):
             plugin.publish(TOPIC_CLOUDCOVER, f'Time elapsed for inference {e-s} seconds', timestamp=e)
 
         plugin.publish(TOPIC_CLOUDCOVER, ratio, timestamp=timestamp)
-        plugin.publish(TOPIC_WHERE, fpoints, timestamp=timestamp)
+        if fpoints != []:
+            plugin.publish(TOPIC_WHERE, fpoints, timestamp=timestamp)
         print(f"Cloud coverage: {ratio} at {fpoints} at time: {imagetimestamp}")
         cv2.imwrite('cloudresult.jpg', data)
         print('saved')

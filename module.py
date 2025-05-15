@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 def circular_sector(center_x, center_y, radius, start_angle, end_angle, num_segments=36):
     angles = [start_angle + (float(i) / num_segments) * (end_angle - start_angle) for i in range(num_segments + 1)]
-    
+
     points = []
     points.append((center_x, center_y))
     for angle in angles:
@@ -26,13 +26,12 @@ def additional_information(copy_pred, pred):
     mask = np.asarray(np.where(new_data > 0)).T
     mask = [Point(x, y) for x, y in mask]
 
-    contours = measure.find_contours(new_data)
     w, h = new_data.shape
     r = int((w/2) * (3/4))
     circle = Point(int(w/2), int(h/2)).buffer(r, resolution=10)
     circlepolygon = Polygon(circle)
     true_count = sum(circlepolygon.contains(point) for point in mask)
-    ratio = true_count / (mask.shape[0] * mask.shape[1])
+    ratio = true_count / circlepolygon.area
 
     conf = torch.maximum(pred[0][0], pred[0][1]).detach().cpu().numpy()
 
@@ -48,37 +47,36 @@ def additional_information(copy_pred, pred):
             tripolygon = Polygon(triangle)
             true_count = sum(tripolygon.contains(point) for point in mask)
 
-            if true_count <= c:
-                continue
-            else:
+            if true_count > c:
+                fpoints = []
                 c = true_count
 
                 tempimage = np.zeros((256, 256))
                 if i < 2:
                     for k in range(128, 256):
                         for l in range(128):
-                            if Point(k, l).within(tripolygon) and copy_pred[k][l] == True:
+                            if shapely.within(Point(l, k), tripolygon):
                                 tempimage[k][l] = True
 
                 elif i < 4:
                     for k in range(128):
                         for l in range(128):
-                            if Point(k, l).within(tripolygon) and copy_pred[k][l] == True:
+                            if shapely.within(Point(l, k), tripolygon):
                                 tempimage[k][l] = True
 
                 elif i < 6:
                     for k in range(128):
                         for l in range(128, 256):
-                            if shapely.within(Point(k, l), tripolygon):
+                            if shapely.within(Point(l, k), tripolygon):
                                 tempimage[k][l] = True
-                
+
                 else:
                     for k in range(128, 256):
                         for l in range(128, 256):
-                            if Point(k, l).within(tripolygon) and copy_pred[k][l] == True:
+                            if shapely.within(Point(l, k), tripolygon):
                                 tempimage[k][l] = True
 
-                fpoints = []
+
                 fcontours = measure.find_contours(tempimage)
                 for fcontour in fcontours:
                     fcoords = measure.approximate_polygon(fcontour, tolerance=2.5)
@@ -104,8 +102,7 @@ class InferMain:
             ])
 
     def run(self, full_image):
-
-        image = torch.from_numpy(self.preprocess(full_image.transpose(2, 0, 1)))
+        image = torch.from_numpy(np.asarray(full_image, dtype=np.float16).transpose(2, 0, 1))
         image_transformed = self.transform(image).type(torch.uint8)
         image = torchvision.io.decode_image(torchvision.io.encode_jpeg(image_transformed))
 
@@ -113,11 +110,10 @@ class InferMain:
         with torch.no_grad():
             output = self.net(image.unsqueeze(0).to(self.device).float())
 
-            copy_pred = output.copy()
-            copy_pred = copy_pred.argmax(axis=1).float()
+            copy_pred = output.argmax(axis=1).float()
             copy_pred = copy_pred.squeeze(0).detach().cpu().numpy()
 
-            ratio, fpoints = additional_information(copy_pred, output)
+            ratio, fpoint = additional_information(copy_pred, output)
 
             fig, ax = plt.subplots(1, 2, figsize=(10, 5))
             ax[0].imshow(full_image)
@@ -135,5 +131,6 @@ class InferMain:
             fig.canvas.draw()
             data = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
             data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+        plt.close()
 
-        return ratio, fpoints, data
+        return ratio, fpoint, data

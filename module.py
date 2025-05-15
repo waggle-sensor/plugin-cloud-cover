@@ -134,5 +134,6 @@ class InferMain:
             fig.canvas.draw()
             data = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
             data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+            plt.close()
 
         return ratio, fpoints, data

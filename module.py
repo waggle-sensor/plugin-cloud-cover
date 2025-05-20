@@ -3,13 +3,12 @@ import numpy as np
 import torch.nn.functional as F
 from shapely.geometry import Polygon, Point
 from skimage import measure
-import matplotlib.pyplot as plt
 
 
 
 def circular_sector(center_x, center_y, radius, start_angle, end_angle, num_segments=36):
     angles = [start_angle + (float(i) / num_segments) * (end_angle - start_angle) for i in range(num_segments + 1)]
-    
+
     points = []
     points.append((center_x, center_y))
     for angle in angles:
@@ -72,13 +71,13 @@ def additional_information(copy_pred, pred):
                         for l in range(128, 256):
                             if shapely.within(Point(k, l), tripolygon):
                                 tempimage[k][l] = True
-                
+
                 else:
                     for k in range(128, 256):
                         for l in range(128, 256):
                             if Point(k, l).within(tripolygon) and copy_pred[k][l] == True:
                                 tempimage[k][l] = True
-    
+
                 fcontours = measure.find_contours(tempimage)
                 if len(fcontours) == 0:
                     fpoint = shapely.centroid(tripolygon)
@@ -121,22 +120,9 @@ class InferMain:
 
             ratio, fpoints = additional_information(copy_pred, output)
 
-            fig, ax = plt.subplots(1, 2, figsize=(10, 5))
-            ax[0].imshow(full_image)
-            ax[0].axis('off')
-            # ax[0].set_title('Input image')
-            # ax[0].axis((0, 256, 0, 256))
-            ax[0].axis((0, 256, 256, 0))
-            ax[1].imshow(copy_pred*255)
-            ax[1].axis('off')
-            # ax[1].set_title('predicted')
-            # ax[1].axis((0, 256, 0, 256))
-            ax[1].axis((0, 256, 256, 0))
+            rgbimage = np.reshape(full_image, (256, 256))
+            result = cv2.cvtColor(copy_pred, cv2.COLOR_GRAY2BGR).astype(np.uint8)
+            hi = np.concatenate((rgbimage, result), axis=1)
 
-            fig.tight_layout()
-            fig.canvas.draw()
-            data = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
-            data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
-            plt.close()
 
-        return ratio, fpoints, data
+        return ratio, fpoints, hi

@@ -5,6 +5,7 @@ RUN pip3 install --no-cache-dir -r /app/requirements.txt
 
 COPY app.py module.py /app/
 
+ADD myunet /app/myunet
 ADD https://web.lcrc.anl.gov/public/waggle/models/cloudcover_best_model_unet_epoch81.pth /app/new_cloudcover_unet.pth
 
 WORKDIR /app

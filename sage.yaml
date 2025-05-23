@@ -1,6 +1,6 @@
 name: "cloud-cover"
 description: "U-Net Cloud Coverage Estimator"
-version : "1.0.1"
+version : "1.0.0"
 namespace: "sage"
 authors: "Seongha Park <seongha.park@anl.gov>"
 license: "MIT license"

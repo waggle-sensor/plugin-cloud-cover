@@ -5,7 +5,6 @@ from shapely.geometry import Polygon, Point
 from skimage import measure
 
 
-
 def circular_sector(center_x, center_y, radius, start_angle, end_angle, num_segments=36):
     angles = [start_angle + (float(i) / num_segments) * (end_angle - start_angle) for i in range(num_segments + 1)]
 
@@ -25,7 +24,8 @@ def additional_information(copy_pred, pred):
     mask = np.asarray(np.where(new_data > 0)).T
     mask = [Point(x, y) for x, y in mask]
 
-    contours = measure.find_contours(new_data)
+    level = 127
+    contours = measure.find_contours(new_data, level)
     w, h = new_data.shape
     r = int((w/2) * (3/4))
     circle = Point(int(w/2), int(h/2)).buffer(r, resolution=10)
@@ -34,7 +34,7 @@ def additional_information(copy_pred, pred):
     ratio = true_count / (copy_pred.shape[0] * copy_pred.shape[1])
     fpoints = []
 
-    conf = torch.maximum(pred[0][0], pred[0][1]).detach().cpu().numpy()
+    conf = torch.max(pred[0][0], pred[0][1]).detach().cpu().numpy()
 
     if conf.mean() > 0 and conf.mean() < 5 and true_count > 500:
 
@@ -101,15 +101,15 @@ class InferMain:
         self.device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
         self.net.to(device=self.device).eval()
         self.transform = torchvision.transforms.Compose([
-            torchvision.transforms.Resize((256, 256)),
+        #     torchvision.transforms.Resize((256, 256)),
             torchvision.transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
             ])
 
     def run(self, full_image):
 
-        image = torch.from_numpy(full_image.transpose(2, 0, 1))
+        image = torch.from_numpy(cv2.resize(full_image, (256,256)).transpose(2, 0, 1)).type(torch.float32)
         image_transformed = self.transform(image).type(torch.uint8)
-        image = torchvision.io.decode_image(torchvision.io.encode_jpeg(image_transformed))
+        # image = torchvision.io.decode_image(torchvision.io.encode_jpeg(image_transformed))
 
 
         with torch.no_grad():
@@ -120,7 +120,7 @@ class InferMain:
 
             ratio, fpoints = additional_information(copy_pred, output)
 
-            rgbimage = np.reshape(full_image, (256, 256))
+            rgbimage = cv2.resize(full_image, (256, 256))
             result = cv2.cvtColor(copy_pred, cv2.COLOR_GRAY2BGR).astype(np.uint8)
             hi = np.concatenate((rgbimage, result), axis=1)
 

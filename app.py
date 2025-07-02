@@ -55,8 +55,11 @@ def run(args):
             # Reset the count
             sampling_countdown = args.sampling_interval
 
-        if args.interval > 0:
-            time.sleep(args.interval)
+        if args.continuous:
+            if args.interval > 0:
+                time.sleep(args.interval)
+        else:
+            exit(0)
 
 
 if __name__ == '__main__':
